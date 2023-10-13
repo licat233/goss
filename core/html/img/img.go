@@ -56,12 +56,20 @@ func (s *Img) init() error {
 }
 
 func (s *Img) Run() {
-	if s.init() != nil {
+	if !s.Status {
 		return
 	}
-
-	for _, filename := range s.filenames {
-		if err := s.handlerSingleFile(filename); err != nil {
+	var err error
+	filenames := s.filenames
+	if len(s.filenames) > 0 && s.filenames[0] == "*" {
+		//遍历当前目录下的所有html文件
+		filenames, err = utils.GetDirFiles(".", ".html")
+		if err != nil {
+			return
+		}
+	}
+	for _, filename := range filenames {
+		if err = s.handlerSingleFile(filename); err != nil {
 			return
 		}
 	}
@@ -90,7 +98,7 @@ func (o *Img) allowUpload(imgUrl string) bool {
 func (o *Img) newSaveFilePath(imagSrc string) string {
 	saveFilename := utils.UUID()
 	if ext := utils.FileExt(imagSrc); ext != "" {
-		saveFilename = fmt.Sprintf("%s.%s", saveFilename, ext)
+		saveFilename = saveFilename + ext
 	}
 	savePath := path.Join(o.folderName, saveFilename)
 	return savePath
@@ -189,6 +197,10 @@ func (o *Img) handlerSingleFile(htmlFilePath string) error {
 		if !exists {
 			return
 		}
+		src = strings.TrimSpace(src)
+		if src == "" {
+			return
+		}
 		newSrc, err := o.uploadToOss(src)
 		if err != nil {
 			utils.Warning("upload image faild: %s", err)
@@ -221,6 +233,6 @@ func (o *Img) handlerSingleFile(htmlFilePath string) error {
 		utils.Error("unexpected error: %s", err)
 	}
 
-	utils.Success("Images uploaded to OSS and HTML file updated.")
+	utils.Success("The image of [%s] file has been processed", htmlFilePath)
 	return nil
 }

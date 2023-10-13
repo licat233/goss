@@ -60,11 +60,11 @@ var rootCmd = &cobra.Command{
 var IsDev bool
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&config.GOSS_OSS_ENDPOINT, "endpoint", "", "your-oss-endpoint. Default use of environment variable value of GOSS_OSS_ENDPOINT.")
-	rootCmd.PersistentFlags().StringVar(&config.GOSS_OSS_ACCESS_KEY_ID, "id", "", "your-access-key-id. Default use of environment variable value of GOSS_OSS_ACCESS_KEY_ID.")
-	rootCmd.PersistentFlags().StringVar(&config.GOSS_OSS_ACCESS_KEY_SECRET, "secret", "", "your-access-key-secret. Default use of environment variable value of GOSS_OSS_ACCESS_KEY_SECRET.")
-	rootCmd.PersistentFlags().StringVar(&config.GOSS_OSS_BUCKET_NAME, "bucket", "", "your-bucket-name. Default use of environment variable value of GOSS_OSS_BUCKET_NAME.")
-	rootCmd.PersistentFlags().StringVar(&config.GOSS_OSS_FOLDER_NAME, "folder", "", "your-oss-folder. Default use of environment variable value of GOSS_OSS_FOLDER_NAME.")
+	rootCmd.PersistentFlags().StringVar(&config.GOSS_OSS_ENDPOINT, "endpoint", "", "your-oss-endpoint. Default use of environment variable value of GOSS_OSS_ENDPOINT")
+	rootCmd.PersistentFlags().StringVar(&config.GOSS_OSS_ACCESS_KEY_ID, "id", "", "your-access-key-id. Default use of environment variable value of GOSS_OSS_ACCESS_KEY_ID")
+	rootCmd.PersistentFlags().StringVar(&config.GOSS_OSS_ACCESS_KEY_SECRET, "secret", "", "your-access-key-secret. Default use of environment variable value of GOSS_OSS_ACCESS_KEY_SECRET")
+	rootCmd.PersistentFlags().StringVar(&config.GOSS_OSS_BUCKET_NAME, "bucket", "", "your-bucket-name. Default use of environment variable value of GOSS_OSS_BUCKET_NAME")
+	rootCmd.PersistentFlags().StringVar(&config.GOSS_OSS_FOLDER_NAME, "folder", "", "your-oss-folder. Default use of environment variable value of GOSS_OSS_FOLDER_NAME")
 
 	rootCmd.PersistentFlags().StringSliceVar(&config.Filenames, "files", []string{"index.html"}, "your-filename. The target file to be processed. When the value is *, all HTML format files in the current directory are selected by default. If multiple files need to be selected, please use the \",\" separator, for example: \"index.html,home.html\".")
 
@@ -89,9 +89,27 @@ func Execute() {
 			}
 		}
 	}()
-
+	initializeData()
 	if err := rootCmd.Execute(); err != nil {
 		utils.Warning(err.Error())
 		os.Exit(1)
+	}
+}
+
+func initializeData() {
+	if config.GOSS_OSS_ENDPOINT == "" {
+		config.GOSS_OSS_ENDPOINT = os.Getenv("GOSS_OSS_ENDPOINT")
+	}
+	if config.GOSS_OSS_ACCESS_KEY_ID == "" {
+		config.GOSS_OSS_ACCESS_KEY_ID = os.Getenv("GOSS_OSS_ACCESS_KEY_ID")
+	}
+	if config.GOSS_OSS_ACCESS_KEY_SECRET == "" {
+		config.GOSS_OSS_ACCESS_KEY_SECRET = os.Getenv("GOSS_OSS_ACCESS_KEY_SECRET")
+	}
+	if config.GOSS_OSS_BUCKET_NAME == "" {
+		config.GOSS_OSS_BUCKET_NAME = os.Getenv("GOSS_OSS_BUCKET_NAME")
+	}
+	if config.GOSS_OSS_FOLDER_NAME == "" {
+		config.GOSS_OSS_FOLDER_NAME = os.Getenv("GOSS_OSS_FOLDER_NAME")
 	}
 }

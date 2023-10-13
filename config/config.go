@@ -1,7 +1,6 @@
 package config
 
 import (
-	"os"
 	"os/exec"
 	"strings"
 
@@ -16,12 +15,12 @@ var (
 )
 
 var (
-	GOSS_OSS_ENDPOINT          string = os.Getenv("GOSS_OSS_ENDPOINT") //Endpoint（地域节点）: oss-cn-guangzhou.aliyuncs.com
-	GOSS_OSS_ACCESS_KEY_ID     string = os.Getenv("GOSS_OSS_ACCESS_KEY_ID")
-	GOSS_OSS_ACCESS_KEY_SECRET string = os.Getenv("GOSS_OSS_ACCESS_KEY_SECRET")
-	GOSS_OSS_BUCKET_NAME       string = os.Getenv("GOSS_OSS_BUCKET_NAME")
+	GOSS_OSS_ENDPOINT          string //Endpoint（地域节点）: oss-cn-guangzhou.aliyuncs.com
+	GOSS_OSS_ACCESS_KEY_ID     string
+	GOSS_OSS_ACCESS_KEY_SECRET string
+	GOSS_OSS_BUCKET_NAME       string
 	// GOSS_OSS_BUCKET_DOMAIN     string = os.Getenv("GOSS_OSS_BUCKET_DOMAIN") //Bucket 域名: 	licat-storage.oss-cn-guangzhou.aliyuncs.com
-	GOSS_OSS_FOLDER_NAME string = os.Getenv("GOSS_OSS_FOLDER_NAME")
+	GOSS_OSS_FOLDER_NAME string
 )
 
 var (

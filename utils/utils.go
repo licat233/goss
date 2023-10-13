@@ -24,7 +24,20 @@ func PathExists(path string) (bool, error) {
 // 检查是否为URL
 func IsURL(input string) bool {
 	u, err := url.Parse(input)
-	return err == nil && u.Scheme != "" && u.Host != ""
+	if err != nil {
+		return false
+	}
+	//存在协议，一定是url
+	if u.Scheme != "" {
+		return true
+	}
+	//没有Host，一定不是url
+	if u.Host == "" {
+		return false
+	}
+	//否则就一定是url
+
+	return true
 }
 
 func UUID() string {

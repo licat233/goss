@@ -16,4 +16,4 @@ go build .
 
 cd example
 
-../goss -h
+../goss run --files="*"
