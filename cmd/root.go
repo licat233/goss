@@ -12,15 +12,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var versionCmd = &cobra.Command{
-	Use:     "version",
-	Aliases: []string{"v"},
-	Short:   "Print the version number of " + config.ProjectName,
-	Run: func(cmd *cobra.Command, args []string) {
-		utils.Success("current version: " + config.ProjectVersion)
-	},
-}
-
 var upgradeCmd = &cobra.Command{
 	Use:     "upgrade",
 	Aliases: []string{"up", "u"},
@@ -35,8 +26,21 @@ var startCmd = &cobra.Command{
 	Aliases: []string{"run"},
 	Short:   "run " + config.ProjectName,
 	Run: func(cmd *cobra.Command, args []string) {
+		defer func() {
+			utils.Success("done.")
+		}()
+		img.Run()
 	},
 }
+
+var setEnvCommand = `export GOSS_OSS_ACCESS_KEY_ID=xxxxxxxxxxxxxxx  # your oss access_key_id
+export GOSS_OSS_ACCESS_KEY_SECRET=xxxxxxxxxxxxxxxxxxx  # you oss access_key_secret
+export GOSS_OSS_BUCKET_NAME=xxxxxxxx  # you oss bucket name
+export GOSS_OSS_FOLDER_NAME=xxxxxx  # the folder name where you save files on OSS, example: images/avatar
+export GOSS_OSS_ENDPOINT=xxxxxxxxxxxxxxxx  # you oss bucket endpoint, example: oss-cn-hongkong.aliyuncs.com
+`
+
+var setEnvCommandWithColor = fmt.Sprintf("\033[33m%s\033[0m\033[32m", setEnvCommand)
 
 var rootCmd = &cobra.Command{
 	Use:        "goss",
@@ -44,7 +48,7 @@ var rootCmd = &cobra.Command{
 	SuggestFor: []string{},
 	Short:      "This is a tool for uploading images from files to OSS",
 	GroupID:    "",
-	Long:       fmt.Sprintf("Upload the images in the specified HTML file to OSS and update the relevant image links.\ncurrent version: %s\nGithub: https://github.com/licat233/goss", config.ProjectVersion),
+	Long:       fmt.Sprintf("Upload the images in the specified HTML file to OSS and update the relevant image links.\ncurrent version: %s\nGithub: https://github.com/licat233/goss.\nif you want to set nev: \n%s", config.ProjectVersion, setEnvCommandWithColor),
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) < 1 {
 			return fmt.Errorf("%s requires at least one argument", cmd.CommandPath())
@@ -53,14 +57,13 @@ var rootCmd = &cobra.Command{
 	},
 	Version: config.ProjectVersion,
 	Run: func(cmd *cobra.Command, args []string) {
-		img.Run()
 	},
 }
 
 var IsDev bool
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&config.GOSS_OSS_ENDPOINT, "endpoint", "", "your-oss-endpoint. Default use of environment variable value of GOSS_OSS_ENDPOINT")
+	rootCmd.PersistentFlags().StringVar(&config.GOSS_OSS_ENDPOINT, "endpoint", "", "your-oss-endpoint. Default use of environment variable value of GOSS_OSS_ENDPOINT, example: oss-cn-hongkong.aliyuncs.com")
 	rootCmd.PersistentFlags().StringVar(&config.GOSS_OSS_ACCESS_KEY_ID, "id", "", "your-access-key-id. Default use of environment variable value of GOSS_OSS_ACCESS_KEY_ID")
 	rootCmd.PersistentFlags().StringVar(&config.GOSS_OSS_ACCESS_KEY_SECRET, "secret", "", "your-access-key-secret. Default use of environment variable value of GOSS_OSS_ACCESS_KEY_SECRET")
 	rootCmd.PersistentFlags().StringVar(&config.GOSS_OSS_BUCKET_NAME, "bucket", "", "your-bucket-name. Default use of environment variable value of GOSS_OSS_BUCKET_NAME")
@@ -71,13 +74,16 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&IsDev, "dev", false, "dev mode, print error message")
 
 	rootCmd.SetHelpTemplate(greenColorizeHelp(rootCmd.HelpTemplate()))
+
+	rootCmd.AddCommand(upgradeCmd)
+	rootCmd.AddCommand(startCmd)
 }
 
 func greenColorizeHelp(template string) string {
 	// 在这里使用ANSI转义码添加颜色
 	// 参考ANSI转义码文档：https://en.wikipedia.org/wiki/ANSI_escape_code
 	// 将标题文本设置为绿色
-	template = "\033[32m" + template + "\033[0m"
+	template = "\033[34m" + template + "\033[0m"
 	return template
 }
 
