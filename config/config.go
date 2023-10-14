@@ -9,7 +9,7 @@ import (
 
 var (
 	ProjectName    = "goss"
-	ProjectVersion = GetVersion()
+	ProjectVersion = ""
 	ProjectInfoURL = "https://api.github.com/repos/licat233/" + ProjectName + "/releases/latest"
 	ProjectURL     = "https://github.com/licat233/" + ProjectName
 )
@@ -29,6 +29,10 @@ var (
 	Dirname   string //需要读取的目录
 	Backup    bool   //备份原文件，防止原文件丢失
 )
+
+func init() {
+	ProjectVersion = GetVersion()
+}
 
 func GetVersion() string {
 	out, err := exec.Command("git", "describe", "--tags", "--abbrev=0").Output()
