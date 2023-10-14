@@ -1,15 +1,8 @@
 package config
 
-import (
-	"os/exec"
-	"strings"
-
-	"github.com/licat233/goss/utils"
-)
-
-var (
+const (
 	ProjectName    = "goss"
-	ProjectVersion = ""
+	ProjectVersion = "v1.0.6"
 	ProjectInfoURL = "https://api.github.com/repos/licat233/" + ProjectName + "/releases/latest"
 	ProjectURL     = "https://github.com/licat233/" + ProjectName
 )
@@ -30,16 +23,12 @@ var (
 	Backup    bool   //备份原文件，防止原文件丢失
 )
 
-func init() {
-	ProjectVersion = GetVersion()
-}
-
-func GetVersion() string {
-	out, err := exec.Command("git", "describe", "--tags", "--abbrev=0").Output()
-	if err != nil {
-		utils.Error("获取git tags出错:%s", err)
-		return "v1.0.0"
-	}
-	version := strings.TrimSpace(string(out))
-	return version
-}
+// func GetVersion() string {
+// 	out, err := exec.Command("git", "describe", "--tags", "--abbrev=0").Output()
+// 	if err != nil {
+// 		utils.Error("获取git tags出错:%s", err)
+// 		return "v1.0.0"
+// 	}
+// 	version := strings.TrimSpace(string(out))
+// 	return version
+// }

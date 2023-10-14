@@ -15,10 +15,10 @@ cd "$current_path" || exit
 comment=$1
 
 if [ -z "$comment" ]; then
-    comment="fix get version error"
+    comment="改为使用代码固定后version号，摒弃使用git的tag，以解决因为git带来的各种问题"
 fi
 
-git tag -a "v1.0.5" -m "$comment"
+git tag -a "v1.0.6" -m "$comment"
 git add .
 git commit -m "$comment"
-# git push -u origin main
+git push -u origin main
