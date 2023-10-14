@@ -2,7 +2,7 @@ package config
 
 const (
 	ProjectName    = "goss"
-	ProjectVersion = "v1.0.6"
+	ProjectVersion = "v1.0.7"
 	ProjectInfoURL = "https://api.github.com/repos/licat233/" + ProjectName + "/releases/latest"
 	ProjectURL     = "https://github.com/licat233/" + ProjectName
 )
