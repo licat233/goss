@@ -3,8 +3,10 @@ package utils_test
 import (
 	"fmt"
 	"log"
+	"strings"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/licat233/goss/utils"
 )
 
@@ -20,4 +22,10 @@ func TestFileExt(t *testing.T) {
 	name := "abcjpg"
 	res := utils.FileExt(name)
 	fmt.Println(res)
+}
+
+func TestUuid(t *testing.T) {
+	u := uuid.New().String()
+	uidWithoutDash := strings.ReplaceAll(u, "-", "")
+	fmt.Println(uidWithoutDash)
 }

@@ -31,3 +31,11 @@ func GetDirFiles(dir string, ext string) ([]string, error) {
 
 	return list, err
 }
+
+func GetFileName(filePath string) string {
+	filePath = strings.TrimSpace(filePath)
+	if filePath == "" {
+		return ""
+	}
+	return filepath.Base(filePath)
+}

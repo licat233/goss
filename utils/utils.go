@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/google/uuid"
 )
@@ -46,4 +47,10 @@ func UUID() string {
 
 func FileExt(filename string) string {
 	return filepath.Ext(filename)
+}
+
+func UUIDhex() string {
+	u := uuid.New().String()
+	uidWithoutDash := strings.ReplaceAll(u, "-", "")
+	return uidWithoutDash
 }

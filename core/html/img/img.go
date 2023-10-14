@@ -14,6 +14,7 @@ import (
 	"github.com/gocolly/colly"
 	"github.com/licat233/goss/config"
 	"github.com/licat233/goss/utils"
+	"github.com/schollz/progressbar/v3"
 )
 
 type Img struct {
@@ -96,7 +97,7 @@ func (o *Img) allowUpload(imgUrl string) bool {
 }
 
 func (o *Img) newSaveFilePath(imagSrc string) string {
-	saveFilename := utils.UUID()
+	saveFilename := utils.UUIDhex()
 	if ext := utils.FileExt(imagSrc); ext != "" {
 		saveFilename = saveFilename + ext
 	}
@@ -191,9 +192,14 @@ func (o *Img) handlerSingleFile(htmlFilePath string) error {
 		return err
 	}
 
+	hasModify := false
+
 	// 遍历并处理img标签
-	doc.Find("img").Each(func(i int, s *goquery.Selection) {
-		src, exists := s.Attr("src")
+	imgsE := doc.Find("img")
+	length := imgsE.Length()
+	bar := progressbar.Default(int64(length)+1, utils.GetFileName(htmlFilePath))
+	var handler = func(s *goquery.Selection, attrName string) {
+		src, exists := s.Attr(attrName)
 		if !exists {
 			return
 		}
@@ -207,32 +213,31 @@ func (o *Img) handlerSingleFile(htmlFilePath string) error {
 			return
 		}
 		// 更新img标签的src属性
-		s.SetAttr("src", newSrc)
-
-		src, exists = s.Attr("data-src")
-		if !exists {
-			return
+		s.SetAttr(attrName, newSrc)
+		if !hasModify {
+			hasModify = true
 		}
-		newSrc, err = o.uploadToOss(src)
-		if err != nil {
-			utils.Warning("upload image faild: %s", err)
-			return
-		}
-		// 更新img标签的src属性
-		s.SetAttr("data-src", newSrc)
+	}
+	imgsE.Each(func(i int, s *goquery.Selection) {
+		handler(s, "src")
+		handler(s, "data-src")
+		bar.Add(1)
 	})
 
-	updatedHTML, err := doc.Html()
-	if err != nil {
-		utils.Error("unexpected error: %s", err)
-		return err
+	if hasModify {
+		updatedHTML, err := doc.Html()
+		if err != nil {
+			utils.Error("unexpected error: %s", err)
+			return err
+		}
+		err = os.WriteFile(htmlFilePath, []byte(updatedHTML), 0666)
+		if err != nil {
+			utils.Error("unexpected error: %s", err)
+		}
 	}
+	bar.Add(1)
+	bar.Finish()
 
-	err = os.WriteFile(htmlFilePath, []byte(updatedHTML), 0666)
-	if err != nil {
-		utils.Error("unexpected error: %s", err)
-	}
-
-	utils.Success("The image of [%s] file has been processed", htmlFilePath)
+	// utils.Success("The image of [%s] file has been processed", htmlFilePath)
 	return nil
 }
