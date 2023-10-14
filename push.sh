@@ -15,10 +15,10 @@ cd "$current_path" || exit
 comment=$1
 
 if [ -z "$comment" ]; then
-    comment="update"
+    comment="fix some bugs, add some functions"
 fi
 
-git tag -a "v1.0.3" -m "$comment"
+git tag -a "v1.0.4" -m "$comment"
 git add .
 git commit -m "$comment"
 git push -u origin main

@@ -24,7 +24,10 @@ var (
 )
 
 var (
+	Proxy     string //网络代理
 	Filenames []string
+	Dirname   string //需要读取的目录
+	Backup    bool   //备份原文件，防止原文件丢失
 )
 
 func GetVersion() string {

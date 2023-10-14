@@ -26,6 +26,7 @@ type Img struct {
 	folderName     string
 	endpoint       string
 	Status         bool
+	backup         bool
 }
 
 func New() *Img {
@@ -38,6 +39,7 @@ func New() *Img {
 		folderName:     config.GOSS_OSS_FOLDER_NAME,
 		endpoint:       config.GOSS_OSS_ENDPOINT,
 		Status:         false,
+		backup:         config.Backup,
 	}
 	i.Status = i.init() == nil
 	return i
@@ -61,39 +63,26 @@ func (s *Img) Run() {
 		return
 	}
 	var err error
-	filenames := s.filenames
-	if len(s.filenames) > 0 && s.filenames[0] == "*" {
-		//遍历当前目录下的所有html文件
-		filenames, err = utils.GetDirFiles(".", ".html")
-		if err != nil {
-			return
-		}
-	}
-	for _, filename := range filenames {
+	for _, filename := range s.filenames {
 		if err = s.handlerSingleFile(filename); err != nil {
 			return
 		}
 	}
 }
 
-func (o *Img) allowUpload(imgUrl string) bool {
-	//判断是否是已经上传到当前bucket的图片
+func (o *Img) isOnCurrentBucket(imgUrl string) bool {
 	u, err := url.Parse(imgUrl)
 	if err != nil {
-		//说明不是url，可以上传
-		return true
+		//说明不是url，肯定不是
+		return false
 	}
 	if u.Host == "" {
-		//不是url，可上传
-		return true
+		//不是url，肯定不是
+		return false
 	}
 	host := fmt.Sprintf("%s.%s", o.bucketName, o.endpoint)
 	contain := strings.Contains(u.Host, host)
-	if contain {
-		//已经存在了，不用上传
-		return false
-	}
-	return true
+	return contain
 }
 
 func (o *Img) newSaveFilePath(imagSrc string) string {
@@ -109,10 +98,13 @@ func (o *Img) getImageBody(imageURL string) (body []byte, status int) {
 	// 发送HTTP GET请求获取图片内容
 	c := colly.NewCollector()
 	c.SetRequestTimeout(10 * time.Second)
-	// proxyURL := "http://127.0.0.1:7890"
-	// if err := c.SetProxy(proxyURL); err != nil {
-	// 	log.Fatalln(err)
-	// }
+	if proxyURL := strings.TrimSpace(config.Proxy); proxyURL != "" {
+		if err := c.SetProxy(proxyURL); err != nil {
+			utils.Error("set proxy error: %s", err)
+			return
+		}
+	}
+
 	c.OnResponse(func(r *colly.Response) {
 		status = r.StatusCode
 		if r.StatusCode != 200 {
@@ -130,19 +122,21 @@ func (o *Img) uploadToOss(imagSrc string) (string, error) {
 	isNetworkURL := utils.IsURL(imagSrc)
 	savePath := o.newSaveFilePath(imagSrc)
 
+	//检查是否已经上传过
+	if imgUrl, ok := o.uploadedImages[imagSrc]; ok {
+		return imgUrl, nil
+	}
+
 	// 如果是本地图片，进行本地上传
 	if !isNetworkURL {
-		if imgUrl, ok := o.uploadedImages[imagSrc]; ok {
-			return imgUrl, nil
-		}
 		err := o.bucket.PutObjectFromFile(savePath, imagSrc)
 		if err != nil {
 			return "", fmt.Errorf("Failed to upload local image to OSS: %s \n %s", err, imagSrc)
 		}
 	} else {
 		imageURL := imagSrc
-		// 如果是网络图片，进行网络流文件上传
-		if !o.allowUpload(imageURL) {
+		// 如果是当前bucket上的，则不用上传
+		if o.isOnCurrentBucket(imageURL) {
 			//不允许上传，返回原路径
 			return imagSrc, nil
 		}
@@ -168,16 +162,16 @@ func (o *Img) uploadToOss(imagSrc string) (string, error) {
 }
 
 func (o *Img) handlerSingleFile(htmlFilePath string) error {
-	//先判断该文件是否存在
-	exist, err := utils.PathExists(htmlFilePath)
-	if err != nil {
-		utils.Error("Unexpected error processing %s file: %s", htmlFilePath, err)
-		return err
-	}
-	if !exist {
-		utils.Warning("The %s file does not exist", htmlFilePath)
-		return nil
-	}
+	//先判断该文件是否存在，root.go中的初始化阶段，已经进行检查过了，这里无需再检查
+	// exist, err := utils.PathExists(htmlFilePath)
+	// if err != nil {
+	// 	utils.Error("Unexpected error processing %s file: %s", htmlFilePath, err)
+	// 	return err
+	// }
+	// if !exist {
+	// 	utils.Warning("The %s file does not exist", htmlFilePath)
+	// 	return nil
+	// }
 
 	// 读取 HTML 文件
 	htmlFile, err := os.Open(htmlFilePath)
@@ -207,11 +201,13 @@ func (o *Img) handlerSingleFile(htmlFilePath string) error {
 		if src == "" {
 			return
 		}
+		newSrc := src
 		newSrc, err := o.uploadToOss(src)
 		if err != nil {
 			utils.Warning("upload image faild: %s", err)
 			return
 		}
+
 		// 更新img标签的src属性
 		s.SetAttr(attrName, newSrc)
 		if !hasModify {
@@ -225,6 +221,13 @@ func (o *Img) handlerSingleFile(htmlFilePath string) error {
 	})
 
 	if hasModify {
+		//备份
+		if o.backup {
+			if err := utils.BackupFile(htmlFilePath); err != nil {
+				utils.Error("backup file [%s] error: %s", htmlFilePath, err)
+				return err
+			}
+		}
 		updatedHTML, err := doc.Html()
 		if err != nil {
 			utils.Error("unexpected error: %s", err)

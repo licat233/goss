@@ -29,3 +29,11 @@ func TestUuid(t *testing.T) {
 	uidWithoutDash := strings.ReplaceAll(u, "-", "")
 	fmt.Println(uidWithoutDash)
 }
+
+func TestBackup(t *testing.T) {
+	sourceFile := "./file.go"
+	err := utils.BackupFile(sourceFile)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
