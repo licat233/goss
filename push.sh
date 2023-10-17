@@ -15,10 +15,10 @@ cd "$current_path" || exit
 comment=$1
 
 if [ -z "$comment" ]; then
-    comment="完善版本号比较功能"
+    comment="原来的bar库有Bug，已替换成另一个库的bar"
 fi
 
-git tag -a "v1.0.7" -m "$comment"
+git tag -a "v1.0.8" -m "$comment"
 git add .
 git commit -m "$comment"
 git push -u origin main

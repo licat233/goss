@@ -11,10 +11,10 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/aliyun/aliyun-oss-go-sdk/oss"
+	"github.com/cheggaaa/pb/v3"
 	"github.com/gocolly/colly"
 	"github.com/licat233/goss/config"
 	"github.com/licat233/goss/utils"
-	"github.com/schollz/progressbar/v3"
 )
 
 type Img struct {
@@ -191,7 +191,9 @@ func (o *Img) handlerSingleFile(htmlFilePath string) error {
 	// 遍历并处理img标签
 	imgsE := doc.Find("img")
 	length := imgsE.Length()
-	bar := progressbar.Default(int64(length)+1, utils.GetFileName(htmlFilePath))
+	// bar := progressbar.Default(int64(length)+1, utils.GetFileName(htmlFilePath))
+	utils.Message("正在处理: %s", utils.GetFileName(htmlFilePath))
+	bar := pb.StartNew(length + 1)
 	var handler = func(s *goquery.Selection, attrName string) {
 		src, exists := s.Attr(attrName)
 		if !exists {
@@ -217,7 +219,7 @@ func (o *Img) handlerSingleFile(htmlFilePath string) error {
 	imgsE.Each(func(i int, s *goquery.Selection) {
 		handler(s, "src")
 		handler(s, "data-src")
-		bar.Add(1)
+		bar.Increment()
 	})
 
 	if hasModify {
@@ -238,9 +240,8 @@ func (o *Img) handlerSingleFile(htmlFilePath string) error {
 			utils.Error("unexpected error: %s", err)
 		}
 	}
-	bar.Add(1)
+	bar.Increment()
 	bar.Finish()
-
 	// utils.Success("The image of [%s] file has been processed", htmlFilePath)
 	return nil
 }
