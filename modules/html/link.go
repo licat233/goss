@@ -31,7 +31,7 @@ func (o *Html) handlerLinkTag(doc *goquery.Document, htmlFilePath string) (hasMo
 			return
 		}
 
-		// 更新link标签的src属性
+		// 更新link标签的href属性
 		s.SetAttr(attrName, newSrc)
 		if !hasModify {
 			hasModify = true

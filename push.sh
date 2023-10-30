@@ -15,10 +15,10 @@ cd "$current_path" || exit
 comment=$1
 
 if [ -z "$comment" ]; then
-    comment="优化新增对文件格式的选择"
+    comment="修复本地文件的查找路径bug"
 fi
 
-git tag -a "v1.1.0-beta.5" -m "$comment"
+git tag -a "v1.1.0-beta.6" -m "$comment"
 git add .
 git commit -m "$comment"
 git push -u origin main

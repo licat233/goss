@@ -138,6 +138,8 @@ func (o *Html) uploadToOss(fileSrc string) (string, error) {
 
 	// 如果是本地路径，进行本地上传
 	if !isNetworkURL {
+		//如果是以/开头的路径，则根目录是config.Dirname，而不是
+		fileSrc = path.Join(config.Dirname, fileSrc)
 		err := o.bucket.PutObjectFromFile(savePath, fileSrc)
 		if err != nil {
 			return "", fmt.Errorf("Failed to upload local file to OSS: %s \n %s", err, fileSrc)
