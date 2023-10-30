@@ -59,17 +59,7 @@ func initializeData() error {
 	// 	utils.Warning("the value [%s] of oss_folder_name is not a local path, defaults to using the root directory", config.GOSS_OSS_FOLDER_NAME)
 	// 	config.GOSS_OSS_FOLDER_NAME = ""
 	// }
-	dirname, err := filepath.Abs(config.Dirname)
-	if err != nil {
-		utils.Error("无法获取到你设置的目录: dir = %s \n error: %s", config.Dirname, err.Error())
-		return err
-	}
-	config.Dirname = dirname
 
-	err = checkoutFiles()
-	if err != nil {
-		return err
-	}
 	for index := range config.HtmlTags {
 		tag := config.HtmlTags[index]
 		if tag == "*" {
@@ -82,11 +72,20 @@ func initializeData() error {
 	return nil
 }
 
-var currentFileExt = "html" //默认选择html文件，可通过各个模块进行修改
+func checkoutFiles(fileExts []string) error {
+	//先处理文件格式
+	exts := utils.MergeSlices(config.Exts, fileExts)
+	isAll := utils.SliceContain(exts, "*")
 
-func checkoutFiles() error {
-	if len(config.Filenames) == 0 {
-		filePaths, err := utils.GetDirFiles(config.Dirname, "html")
+	if len(config.Filenames) == 0 { //如果指定文件，则以文件格式作为依据
+		var fileExt []string
+		if isAll { //选择全部文件
+			fileExt = nil
+		} else {
+			//优先选择用户指定的文件
+			fileExt = exts
+		}
+		filePaths, err := utils.GetDirFiles(config.Dirname, fileExt)
 		if err != nil {
 			utils.Error("Failed to obtain the list of HTML files in the %s directory", config.Dirname)
 			return err
@@ -132,7 +131,12 @@ func multipleSelectionFiles(options []string) ([]string, error) {
 	selectTxt := color.New(color.FgHiMagenta)
 
 	if len(options) == 0 {
-		keyword.Printf("目录下没有文件，请确认目标目录: %s\n", config.Dirname)
+		dirname, err := filepath.Abs(config.Dirname)
+		if err != nil {
+			utils.Error("无法获取到你设置的目录: dir = %s \n error: %s", dirname, err.Error())
+			return nil, err
+		}
+		keyword.Printf("目录下没有文件，请确认目标目录: %s\n", dirname)
 		return nil, nil
 	}
 

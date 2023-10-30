@@ -19,7 +19,8 @@ import (
 )
 
 const Name = "tools for processing HTML files"
-const CheckoutFileExt = "html"
+
+var CheckoutFileExt = []string{"html", "htm"}
 
 var SupportTags = []string{"img", "link", "script"}
 

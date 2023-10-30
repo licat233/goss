@@ -54,3 +54,66 @@ func UUIDhex() string {
 	uidWithoutDash := strings.ReplaceAll(u, "-", "")
 	return uidWithoutDash
 }
+
+func MergeSlices(slice1, slice2 []string) []string {
+	seen := make(map[string]bool)
+	result := make([]string, 0)
+
+	for _, item := range slice1 {
+		if item != "" {
+			seen[item] = true
+			result = append(result, item)
+		}
+	}
+
+	for _, item := range slice2 {
+		if item != "" && !seen[item] {
+			seen[item] = true
+			result = append(result, item)
+		}
+	}
+
+	return result
+}
+
+func SliceContain(slice []string, target string) bool {
+	for _, item := range slice {
+		if item == target {
+			return true
+		}
+	}
+	return false
+}
+
+func SliceContains(slice []string, targets []string) bool {
+	for _, target := range targets {
+		found := false
+		for _, item := range slice {
+			if item == target {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return false
+		}
+	}
+	return true
+}
+
+func SliceRemoves(sliceString []string, removeList []string) []string {
+	result := make([]string, 0)
+	for _, word := range sliceString {
+		found := false
+		for _, removeWord := range removeList {
+			if word == removeWord {
+				found = true
+				break
+			}
+		}
+		if !found {
+			result = append(result, word)
+		}
+	}
+	return result
+}

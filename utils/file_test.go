@@ -11,7 +11,7 @@ import (
 )
 
 func TestGetFiles(t *testing.T) {
-	list, err := utils.GetDirFiles("../example", "html")
+	list, err := utils.GetDirFiles("../example", nil)
 	if err != nil {
 		log.Fatalln(err)
 	}

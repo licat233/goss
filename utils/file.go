@@ -10,16 +10,26 @@ import (
 )
 
 // 获取指定目录下的某些格式的文件列表
-func GetDirFiles(dir string, ext string) ([]string, error) {
+func GetDirFiles(dir string, exts []string) ([]string, error) {
 	if dir == "" {
 		dir = "."
 	}
-	if ext != "" && ext != "*" {
-		if strings.HasPrefix(ext, ".") {
-			ext = strings.TrimLeft(ext, ".")
-		}
-		ext = "." + ext
+	isAll := len(exts) == 0
+	if !isAll {
+		isAll = SliceContain(exts, "*")
+		exts = SliceRemoves(exts, []string{"", "*"})
 	}
+
+	if !isAll {
+		//处理文件格式名
+		for i := range exts {
+			ext := exts[i]
+			ext = strings.TrimLeft(ext, ".")
+			ext = "." + ext
+			exts[i] = ext
+		}
+	}
+
 	var list []string
 	err := filepath.WalkDir(dir, func(path string, dirEntry fs.DirEntry, err error) error {
 		if err != nil {
@@ -30,9 +40,16 @@ func GetDirFiles(dir string, ext string) ([]string, error) {
 			// 如果是目录且不是当前目录，则跳过
 			return filepath.SkipDir
 		}
-		if ext != "*" && ext != "" {
-			if strings.HasSuffix(dirEntry.Name(), ext) {
-				list = append(list, path)
+		if isAll {
+			//全部选择
+			list = append(list, path)
+		} else {
+			//查找是否存在
+			for _, ext := range exts {
+				if strings.HasSuffix(dirEntry.Name(), ext) {
+					list = append(list, path)
+					break
+				}
 			}
 		}
 		return nil

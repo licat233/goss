@@ -14,7 +14,7 @@ var localCmd = &cobra.Command{
 		defer func() {
 			utils.Success("done.")
 		}()
-		run(_loacl.Run, _loacl.CheckoutFileExt)
+		run(_loacl.Run, _loacl.CheckoutFileExts)
 	},
 }
 

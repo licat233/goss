@@ -73,7 +73,8 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&config.GOSS_OSS_FOLDER_NAME, "folder", "", "your-oss-folder. Default use of environment variable value of GOSS_OSS_FOLDER_NAME")
 
 	rootCmd.PersistentFlags().StringVar(&config.Dirname, "dir", ".", "The directory where the HTML file is located, defaults to the current directory")
-	rootCmd.PersistentFlags().StringSliceVar(&config.Filenames, "files", nil, "your-filename. The target file to be processed. When the value is *, all HTML format files in the current directory are selected by default. If multiple files need to be selected, please use the \",\" separator, for example: \"index.html,home.html\".")
+	rootCmd.PersistentFlags().StringSliceVar(&config.Filenames, "files", nil, "your-fileext. The target file to be processed. If multiple files need to be selected, please use the \",\" separator, for example: \"index.html,home.html\".")
+	rootCmd.PersistentFlags().StringSliceVar(&config.Exts, "exts", nil, "your-file-extension name. The target file to be processed.For example: \"html,htm\".")
 	rootCmd.PersistentFlags().BoolVar(&config.Backup, "backup", true, "Back up the original files to prevent their loss")
 
 	rootCmd.PersistentFlags().StringVar(&config.Proxy, "proxy", "", "network proxy address")
@@ -86,9 +87,12 @@ func init() {
 	rootCmd.AddGroup(modulesGroup)
 }
 
-func run(moduleRunFunc func() error, checkoutFileExt string) {
-	currentFileExt = checkoutFileExt
+func run(moduleRunFunc func() error, checkoutFileExts []string) {
 	err := initializeData()
+	if err != nil {
+		return
+	}
+	err = checkoutFiles(checkoutFileExts)
 	if err != nil {
 		return
 	}
