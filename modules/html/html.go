@@ -91,15 +91,16 @@ func (o *Html) isOnCurrentBucket(imgUrl string) bool {
 	return contain
 }
 
-func (o *Html) newSaveFilePath(imagSrc string) string {
+func (o *Html) newSaveFilePath(fileSrc string) string {
 	saveFilename := utils.UUIDhex()
-	ext := utils.FileExt(imagSrc)
-	if ext != "" {
-		saveFilename = saveFilename + ext
-	} else {
+	ext := utils.FileExt(fileSrc)
+	if ext == "" {
 		ext = "other"
 	}
-	savePath := path.Join(o.folderName, ext, saveFilename)
+	ext = strings.TrimLeft(ext, ".")
+	saveFilename = strings.TrimRight(saveFilename, ".")
+	saveFilename = saveFilename + "." + ext
+	savePath := path.Join(o.folderName, saveFilename)
 	return savePath
 }
 
