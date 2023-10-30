@@ -73,19 +73,17 @@ func initializeData() error {
 }
 
 func checkoutFiles(fileExts []string) error {
-	//先处理文件格式
-	exts := utils.MergeSlices(config.Exts, fileExts)
-	isAll := utils.SliceContain(exts, "*")
-
-	if len(config.Filenames) == 0 { //如果指定文件，则以文件格式作为依据
-		var fileExt []string
-		if isAll { //选择全部文件
-			fileExt = nil
-		} else {
-			//优先选择用户指定的文件
-			fileExt = exts
+	if len(config.Filenames) == 0 { //如果不指定文件，则以文件格式作为依据
+		//如果用户设置了文件格式，则以用户的设置为准
+		if len(config.Exts) != 0 {
+			fileExts = config.Exts
 		}
-		filePaths, err := utils.GetDirFiles(config.Dirname, fileExt)
+		//如果没有设置，则以module服务默认为准
+		isAll := utils.SliceContain(fileExts, "*") || len(fileExts) == 0
+		if isAll { //选择全部文件
+			fileExts = nil
+		}
+		filePaths, err := utils.GetDirFiles(config.Dirname, fileExts)
 		if err != nil {
 			utils.Error("Failed to obtain the list of HTML files in the %s directory", config.Dirname)
 			return err

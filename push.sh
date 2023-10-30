@@ -15,10 +15,10 @@ cd "$current_path" || exit
 comment=$1
 
 if [ -z "$comment" ]; then
-    comment="新增对文件格式的选择，可以通过文件格式进行文件筛选"
+    comment="优化新增对文件格式的选择"
 fi
 
-git tag -a "v1.1.0-beta.4" -m "$comment"
+git tag -a "v1.1.0-beta.5" -m "$comment"
 git add .
 git commit -m "$comment"
 git push -u origin main
