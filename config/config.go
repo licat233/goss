@@ -2,7 +2,7 @@ package config
 
 const (
 	ProjectName    = "goss"
-	ProjectVersion = "v1.0.9"
+	ProjectVersion = "v1.1.0-beta.1"
 	ProjectInfoURL = "https://api.github.com/repos/licat233/" + ProjectName + "/releases/latest"
 	ProjectURL     = "https://github.com/licat233/" + ProjectName
 )
@@ -21,6 +21,10 @@ var (
 	Filenames []string
 	Dirname   string //需要读取的目录
 	Backup    bool   //备份原文件，防止原文件丢失
+)
+
+var (
+	HtmlTags []string //选择处理的html标签
 )
 
 // func GetVersion() string {

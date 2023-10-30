@@ -1,6 +1,8 @@
 # goss
 
-将指定的html文件内的图片上传到oss中，并更新链接
+html模块功能：将指定的html文件内的资源上传到oss中，并更新链接
+
+local模块功能：暂未开发，还没拟好
 
 ## install
 
@@ -13,7 +15,7 @@ go install github.com/licat233/goss@latest
 ```shell
 $goss -h
 Upload the images in the specified HTML file to OSS and update the relevant image links.
-current version: v1.0.6
+current version: v1.0.9
 Github: https://github.com/licat233/goss.
 if you want to set nev:
 export GOSS_OSS_ACCESS_KEY_ID=xxxxxxxxxxxxxxx  # your oss access_key_id
@@ -29,7 +31,8 @@ Usage:
 Available Commands:
   completion  Generate the autocompletion script for the specified shell
   help        Help about any command
-  start       run goss
+  html        checkout: tools for processing HTML files
+  local       checkout: local file processing tools
   upgrade     Upgrade goss to latest version
 
 Flags:

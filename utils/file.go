@@ -14,7 +14,7 @@ func GetDirFiles(dir string, ext string) ([]string, error) {
 	if dir == "" {
 		dir = "."
 	}
-	if ext != "" {
+	if ext != "" && ext != "*" {
 		if strings.HasPrefix(ext, ".") {
 			ext = strings.TrimLeft(ext, ".")
 		}
@@ -30,8 +30,10 @@ func GetDirFiles(dir string, ext string) ([]string, error) {
 			// 如果是目录且不是当前目录，则跳过
 			return filepath.SkipDir
 		}
-		if strings.HasSuffix(dirEntry.Name(), ext) {
-			list = append(list, path)
+		if ext != "*" && ext != "" {
+			if strings.HasSuffix(dirEntry.Name(), ext) {
+				list = append(list, path)
+			}
 		}
 		return nil
 	})

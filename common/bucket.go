@@ -1,4 +1,4 @@
-package img
+package common
 
 import (
 	"errors"
@@ -8,7 +8,7 @@ import (
 	"github.com/licat233/goss/utils"
 )
 
-func newOssBucket() (*oss.Bucket, error) {
+func NewOssBucket() (*oss.Bucket, error) {
 	// 初始化 OSS 客户端
 	endpoint := config.GOSS_OSS_ENDPOINT
 	if endpoint == "" {
