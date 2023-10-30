@@ -14,7 +14,7 @@ import (
 
 var modulesGroup = &cobra.Group{
 	ID:    "modules",
-	Title: "modules",
+	Title: "modules:",
 }
 
 var upgradeCmd = &cobra.Command{

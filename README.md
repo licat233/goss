@@ -14,8 +14,8 @@ go install github.com/licat233/goss@latest
 
 ```shell
 $goss -h
-Upload the images in the specified HTML file to OSS and update the relevant image links.
-current version: v1.0.9
+Upload the specified file resources to OSS.
+current version: v1.1.0
 Github: https://github.com/licat233/goss.
 if you want to set nev:
 export GOSS_OSS_ACCESS_KEY_ID=xxxxxxxxxxxxxxx  # your oss access_key_id
@@ -28,11 +28,13 @@ Usage:
   goss [flags]
   goss [command]
 
-Available Commands:
-  completion  Generate the autocompletion script for the specified shell
-  help        Help about any command
+modules:
   html        checkout: tools for processing HTML files
   local       checkout: local file processing tools
+
+Additional Commands:
+  completion  Generate the autocompletion script for the specified shell
+  help        Help about any command
   upgrade     Upgrade goss to latest version
 
 Flags:
