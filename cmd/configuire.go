@@ -11,7 +11,6 @@ import (
 
 	"github.com/fatih/color"
 	"github.com/licat233/goss/config"
-	_html "github.com/licat233/goss/modules/html"
 	"github.com/licat233/goss/utils"
 )
 
@@ -60,13 +59,8 @@ func initializeData() error {
 	// 	config.GOSS_OSS_FOLDER_NAME = ""
 	// }
 
-	for index := range config.HtmlTags {
-		tag := config.HtmlTags[index]
-		if tag == "*" {
-			config.HtmlTags = _html.SupportTags
-			break
-		}
-		config.HtmlTags[index] = strings.ToLower(tag)
+	if err := checkHtmlConfig(); err != nil {
+		return err
 	}
 
 	return nil

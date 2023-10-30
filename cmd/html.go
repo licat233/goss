@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/licat233/goss/config"
 	_html "github.com/licat233/goss/modules/html"
@@ -26,4 +27,22 @@ func init() {
 	// htmlCmd.AddCommand(htmlStartCmd)
 	htmlCmd.SetHelpTemplate(setColorizeHelp(htmlCmd.HelpTemplate()))
 	rootCmd.AddCommand(htmlCmd)
+}
+
+func checkHtmlConfig() error {
+	if len(config.HtmlTags) != 0 {
+		//如果用户指定了，则以用户的为准
+		for index := range config.HtmlTags {
+			tag := config.HtmlTags[index]
+			if tag == "*" {
+				config.HtmlTags = _html.SupportTags
+				break
+			}
+			config.HtmlTags[index] = strings.ToLower(tag)
+		}
+	} else {
+		//否则以系统默认的为准
+		config.HtmlTags = _html.SupportTags
+	}
+	return nil
 }

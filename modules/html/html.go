@@ -214,11 +214,14 @@ func (o *Html) handlerSingleFile(htmlFilePath string) error {
 			if !hasModify {
 				hasModify = isModify
 			}
+		case "script":
+			// 处理script标签
+			isModify := o.handlerScriptTag(doc, htmlFilePath)
+			if !hasModify {
+				hasModify = isModify
+			}
 		}
 	}
-
-	// 处理img标签
-	hasModify = o.handlerImgTag(doc, htmlFilePath)
 
 	if hasModify {
 		//备份
