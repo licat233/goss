@@ -12,13 +12,7 @@ import (
 var htmlCmd = &cobra.Command{
 	Use:     "html",
 	GroupID: "modules",
-	Short:   "checkout: " + _html.Name,
-}
-
-var htmlStartCmd = &cobra.Command{
-	Use:     "start",
-	Aliases: []string{"run"},
-	Short:   "run " + _html.Name,
+	Short:   _html.Name,
 	Run: func(cmd *cobra.Command, args []string) {
 		defer func() {
 			utils.Success("done.")
@@ -29,6 +23,7 @@ var htmlStartCmd = &cobra.Command{
 
 func init() {
 	htmlCmd.PersistentFlags().StringSliceVar(&config.HtmlTags, "tags", []string{"*"}, fmt.Sprintf("Select the HTML tags to process,current support: %s", _html.SupportTags))
-	htmlCmd.AddCommand(htmlStartCmd)
+	// htmlCmd.AddCommand(htmlStartCmd)
 	htmlCmd.SetHelpTemplate(setColorizeHelp(htmlCmd.HelpTemplate()))
+	rootCmd.AddCommand(htmlCmd)
 }

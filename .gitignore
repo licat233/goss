@@ -21,3 +21,5 @@
 go.work
 goss
 test
+
+example/build

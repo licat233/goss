@@ -84,8 +84,6 @@ func init() {
 	rootCmd.SetHelpTemplate(setColorizeHelp(rootCmd.HelpTemplate()))
 	//modules
 	rootCmd.AddGroup(modulesGroup)
-	rootCmd.AddCommand(htmlCmd)
-	rootCmd.AddCommand(localCmd)
 }
 
 func run(moduleRunFunc func() error, checkoutFileExt string) {

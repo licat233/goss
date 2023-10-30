@@ -9,13 +9,7 @@ import (
 var localCmd = &cobra.Command{
 	Use:     "local",
 	GroupID: "modules",
-	Short:   "checkout: " + _loacl.Name,
-}
-
-var localStartCmd = &cobra.Command{
-	Use:     "start",
-	Aliases: []string{"run"},
-	Short:   "run " + _loacl.Name,
+	Short:   _loacl.Name,
 	Run: func(cmd *cobra.Command, args []string) {
 		defer func() {
 			utils.Success("done.")
@@ -25,6 +19,7 @@ var localStartCmd = &cobra.Command{
 }
 
 func init() {
-	localCmd.AddCommand(htmlStartCmd)
-	localCmd.SetHelpTemplate(setColorizeHelp(htmlCmd.HelpTemplate()))
+	// localCmd.AddCommand(localStartCmd)
+	localCmd.SetHelpTemplate(setColorizeHelp(localCmd.HelpTemplate()))
+	rootCmd.AddCommand(localCmd)
 }

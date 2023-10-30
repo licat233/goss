@@ -16,4 +16,4 @@ go build .
 
 cd example
 
-../goss html -h run
+../goss html --dir=build -h
