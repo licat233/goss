@@ -30,7 +30,6 @@ Usage:
 
 modules:
   html        tools for processing HTML files
-  local       local file processing tools
   upload      upload file processing tools
 
 Additional Commands:
