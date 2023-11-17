@@ -1,8 +1,8 @@
 # goss
 
-html模块功能：将指定的html文件内的资源上传到oss中，并更新链接
+html模块功能：将指定的html文件内的资源上传到oss中，并更新内容链接
 
-local模块功能：暂未开发，还没拟好
+upload模块功能：上传指定文件到oss中
 
 ## install
 
