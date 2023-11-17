@@ -15,7 +15,7 @@ go install github.com/licat233/goss@latest
 ```shell
 $goss -h
 Upload the specified file resources to OSS.
-current version: v1.1.0
+current version: v1.1.0-beta.9
 Github: https://github.com/licat233/goss.
 if you want to set nev:
 export GOSS_OSS_ACCESS_KEY_ID=xxxxxxxxxxxxxxx  # your oss access_key_id
@@ -29,8 +29,9 @@ Usage:
   goss [command]
 
 modules:
-  html        checkout: tools for processing HTML files
-  local       checkout: local file processing tools
+  html        tools for processing HTML files
+  local       local file processing tools
+  upload      upload file processing tools
 
 Additional Commands:
   completion  Generate the autocompletion script for the specified shell
@@ -43,7 +44,8 @@ Flags:
       --dev               dev mode, print error message
       --dir string        The directory where the HTML file is located, defaults to the current directory (default ".")
       --endpoint string   your-oss-endpoint. Default use of environment variable value of GOSS_OSS_ENDPOINT, example: oss-cn-hongkong.aliyuncs.com
-      --files strings     your-filename. The target file to be processed. When the value is *, all HTML format files in the current directory are selected by default. If multiple files need to be selected, please use the "," separator, for example: "index.html,home.html".
+      --exts strings      your-file-extension name. The target file to be processed.For example: "html,htm".
+      --files strings     your-fileext. The target file to be processed. If multiple files need to be selected, please use the "," separator, for example: "index.html,home.html".
       --folder string     your-oss-folder. Default use of environment variable value of GOSS_OSS_FOLDER_NAME
   -h, --help              help for goss
       --id string         your-access-key-id. Default use of environment variable value of GOSS_OSS_ACCESS_KEY_ID
