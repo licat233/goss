@@ -25,7 +25,7 @@ func (o *Html) handlerImgTag(doc *goquery.Document, htmlFilePath string) (hasMod
 			return
 		}
 		newSrc := src
-		newSrc, err := o.uploadToOss(src)
+		newSrc, err := o.Bucket.UploadToOss(src)
 		if err != nil {
 			utils.Warning("upload image faild: %s", err)
 			return

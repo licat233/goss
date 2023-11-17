@@ -63,32 +63,32 @@ func initializeData() error {
 		return err
 	}
 
+	if utils.SliceContain(config.Filenames, "*") {
+		config.Filenames = nil
+	}
+
 	return nil
 }
 
-func checkoutFiles(fileExts []string) error {
-	if len(config.Filenames) == 0 { //如果不指定文件，则以文件格式作为依据
+func checkoutFiles(fileExts []string) ([]string, error) {
+	//如果不指定文件，或者指定文件为*，则以文件格式作为依据
+	if len(config.Filenames) == 0 || utils.SliceContain(config.Filenames, "*") {
 		//如果用户设置了文件格式，则以用户的设置为准
 		if len(config.Exts) != 0 {
 			fileExts = config.Exts
 		}
-		//如果没有设置，则以module服务默认为准
-		isAll := utils.SliceContain(fileExts, "*") || len(fileExts) == 0
-		if isAll { //选择全部文件
-			fileExts = nil
-		}
-		filePaths, err := utils.GetDirFiles(config.Dirname, fileExts)
+		filePaths, err := utils.GetAllFiles(config.Dirname, fileExts)
 		if err != nil {
 			utils.Error("Failed to obtain the list of HTML files in the %s directory", config.Dirname)
-			return err
+			return nil, err
 		}
 		filesName, err := multipleSelectionFiles(filePaths)
 		for _, fileName := range filesName {
 			config.Filenames = append(config.Filenames, path.Join(config.Dirname, fileName))
 		}
 	} else {
-		filenames := []string{}
-		for _, fileName := range config.Filenames {
+		//检查指定的文件
+		for i, fileName := range config.Filenames {
 			var filePath string
 			if utils.IsAbsolutePath(fileName) {
 				filePath = fileName
@@ -100,17 +100,18 @@ func checkoutFiles(fileExts []string) error {
 			exist, err := utils.PathExists(filePath)
 			if err != nil {
 				utils.Error("Unexpected error reading %s file: %s", filePath, err)
-				return err
+				return nil, err
 			}
 			if !exist {
 				//不存在
 				utils.Error("file [%s] not exist, please check the value of --files entered", filePath)
-				return fmt.Errorf("file [%s] not exist, please check the value of --files entered", filePath)
+				return nil, fmt.Errorf("file [%s] not exist, please check the value of --files entered", filePath)
 			}
-			filenames = append(filenames, filePath)
+			config.Filenames[i] = filePath
 		}
 	}
-	return nil
+	config.Filenames = utils.SliceRemoves(config.Filenames, []string{"*", ""})
+	return config.Filenames, nil
 }
 
 func multipleSelectionFiles(options []string) ([]string, error) {
@@ -143,7 +144,7 @@ func multipleSelectionFiles(options []string) ([]string, error) {
 	for {
 		// 获取用户选择
 		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("请输入选项的编号: ")
+		title.Print("请输入选项的编号: ")
 		input, err := reader.ReadString('\n')
 		if err != nil {
 			utils.Error("读取输入时发生错误:%s", err)
@@ -182,7 +183,7 @@ func multipleSelectionFiles(options []string) ([]string, error) {
 
 	choicesOption := []string{}
 	// 输出用户选择
-	fmt.Println("您选择了以下选项:")
+	title.Println("您选择了以下文件:")
 	for i, isSelected := range selected {
 		if isSelected {
 			color.Green("- %s", options[i])

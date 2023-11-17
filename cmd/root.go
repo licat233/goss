@@ -92,8 +92,12 @@ func run(moduleRunFunc func() error, checkoutFileExts []string) {
 	if err != nil {
 		return
 	}
-	err = checkoutFiles(checkoutFileExts)
+	files, err := checkoutFiles(checkoutFileExts)
 	if err != nil {
+		return
+	}
+	if len(files) == 0 {
+		//如果没有文件，直接退出
 		return
 	}
 	err = global.Initialize()

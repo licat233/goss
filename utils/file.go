@@ -3,11 +3,74 @@ package utils
 import (
 	"fmt"
 	"io/fs"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 )
+
+// 获取指定目录下的所有文件或目录
+// 如果exts为空，则获取所有文件和目录
+// 如果exts包含"*"，则获取所有文件
+// 如果exts不包含"*"，但包含其他字符，则获取对应格式名的文件
+func GetAllFiles(dirPath string, exts []string) ([]string, error) {
+	if dirPath == "" {
+		dirPath = "."
+	}
+	isAll := len(exts) == 0
+	justContainCurrentDir := false
+	if SliceContain(exts, "*") {
+		isAll = true
+		justContainCurrentDir = true
+		exts = nil
+	}
+
+	//处理文件格式名
+	for i := range exts {
+		ext := exts[i]
+		if ext == "" {
+			continue
+		}
+		ext = strings.TrimLeft(ext, ".")
+		if ext != "" {
+			ext = "." + ext
+		}
+		exts[i] = ext
+	}
+
+	var list []string
+	err := filepath.WalkDir(dirPath, func(path string, dirEntry fs.DirEntry, err error) error {
+		if err != nil {
+			Error("访问路径 %q 出错：%v\n", path, err)
+			return err
+		}
+
+		if dirEntry.IsDir() {
+			if path == dirPath {
+				return nil
+			}
+			//如果只包含当前目录，则忽略其它目录
+			//前提是不能是当前目录
+			if justContainCurrentDir {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if isAll {
+			//如果全部选择则不用判断格式
+			list = append(list, path)
+			return nil
+		}
+		if SliceContain(exts, filepath.Ext(dirEntry.Name())) {
+			//全部选择
+			list = append(list, path)
+		}
+		return nil
+	})
+
+	return list, err
+}
 
 // 获取指定目录下的某些格式的文件列表
 func GetDirFiles(dir string, exts []string) ([]string, error) {
@@ -17,15 +80,20 @@ func GetDirFiles(dir string, exts []string) ([]string, error) {
 	isAll := len(exts) == 0
 	if !isAll {
 		isAll = SliceContain(exts, "*")
-		exts = SliceRemoves(exts, []string{"", "*"})
+		exts = SliceRemoves(exts, []string{"*"})
 	}
 
 	if !isAll {
 		//处理文件格式名
 		for i := range exts {
 			ext := exts[i]
+			if ext == "" {
+				continue
+			}
 			ext = strings.TrimLeft(ext, ".")
-			ext = "." + ext
+			if ext != "" {
+				ext = "." + ext
+			}
 			exts[i] = ext
 		}
 	}
@@ -40,17 +108,9 @@ func GetDirFiles(dir string, exts []string) ([]string, error) {
 			// 如果是目录且不是当前目录，则跳过
 			return filepath.SkipDir
 		}
-		if isAll {
+		if isAll || SliceContain(exts, filepath.Ext(dirEntry.Name())) {
 			//全部选择
 			list = append(list, path)
-		} else {
-			//查找是否存在
-			for _, ext := range exts {
-				if strings.HasSuffix(dirEntry.Name(), ext) {
-					list = append(list, path)
-					break
-				}
-			}
 		}
 		return nil
 	})
@@ -100,4 +160,19 @@ func BackupFile(srcPath string) error {
 	}
 
 	return nil
+}
+
+func getFilesAndDirs(dirPath string) ([]string, error) {
+	var files []string
+
+	fileInfos, err := ioutil.ReadDir(dirPath)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, fileInfo := range fileInfos {
+		files = append(files, fileInfo.Name())
+	}
+
+	return files, nil
 }

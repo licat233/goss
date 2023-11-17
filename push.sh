@@ -15,10 +15,10 @@ cd "$current_path" || exit
 comment=$1
 
 if [ -z "$comment" ]; then
-    comment="修复oss保存路径错误的问题"
+    comment="update"
 fi
 
-git tag -a "v1.1.0-beta.8" -m "$comment"
+git tag -a "v1.1.0-beta.9" -m "$comment"
 git add .
 git commit -m "$comment"
 git push -u origin main

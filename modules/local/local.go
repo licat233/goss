@@ -7,6 +7,6 @@ const Name = "local file processing tools"
 var CheckoutFileExts []string = nil
 
 func Run() error {
-	utils.Message("This feature has not been developed!")
+	utils.Message("This model has not been developed!")
 	return nil
 }
