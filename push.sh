@@ -18,7 +18,7 @@ if [ -z "$comment" ]; then
     comment="update"
 fi
 
-# git tag -a "v1.1.0" -m "$comment"
+git tag -a "v1.1.1-beta.1" -m "$comment"
 git add .
 git commit -m "$comment"
 git push -u origin main

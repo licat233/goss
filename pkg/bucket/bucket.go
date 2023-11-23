@@ -27,6 +27,7 @@ type Bucket struct {
 	folderName    string
 	endpoint      string
 	Status        bool
+	HasUpload     bool
 }
 
 func New(filenames []string) *Bucket {
@@ -46,6 +47,7 @@ func New(filenames []string) *Bucket {
 		folderName:    config.GOSS_OSS_FOLDER_NAME,
 		endpoint:      config.GOSS_OSS_ENDPOINT,
 		Status:        global.Bucket != nil,
+		HasUpload:     false,
 	}
 }
 
@@ -74,6 +76,9 @@ func (s *Bucket) UploadToOss(fileSrc string) (string, error) {
 	//检查是否已经上传过
 	if fileUrl, ok := s.UploadedFiles[fileSrc]; ok {
 		return fileUrl, nil
+	}
+	if !s.HasUpload {
+		s.HasUpload = true
 	}
 	// 如果是本地路径，进行本地上传
 	if !isNetworkURL {
@@ -199,10 +204,11 @@ func (s *Bucket) CreateLog(uploadedFiles map[string]string) error {
 	return nil
 }
 
-func ReadLog() (map[string]string, error) {
+func ReadLog() (uploadedFiles map[string]string, err error) {
+	uploadedFiles = make(map[string]string)
 	file, err := os.Open("goss_upload_log.json")
 	if err != nil {
-		return nil, err
+		return
 	}
 	defer file.Close()
 
@@ -210,13 +216,11 @@ func ReadLog() (map[string]string, error) {
 	var fileLogs []fileLog
 	err = decoder.Decode(&fileLogs)
 	if err != nil {
-		return nil, err
+		return
 	}
 
-	uploadedFiles := make(map[string]string)
 	for _, fileLog := range fileLogs {
 		uploadedFiles[fileLog.Path] = fileLog.Url
 	}
-
-	return uploadedFiles, nil
+	return
 }

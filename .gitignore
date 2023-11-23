@@ -23,3 +23,5 @@ goss
 test
 
 example/build
+**/*.html
+**/*.json
